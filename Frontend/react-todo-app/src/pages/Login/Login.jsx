@@ -1,6 +1,30 @@
 import NavBar from "../../components/NavBar/NavBar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
 export default function Login() {
+  const [data, setData] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    await axios
+      .post("/api/auth/login", data)
+      .then((res) => {
+        if (res.status === 200) {
+          localStorage.setItem("token", res.data.token);
+          navigate("/dashboard");
+        }
+      })
+      .catch((err) => {
+        setError(err);
+      });
+  };
   return (
     <>
       <div>
@@ -23,6 +47,10 @@ export default function Login() {
                 </label>
                 <div className="mt-2">
                   <input
+                    value={data.email}
+                    onChange={(e) =>
+                      setData({ ...data, email: e.target.value })
+                    }
                     id="email"
                     name="email"
                     type="email"
@@ -53,6 +81,10 @@ export default function Login() {
                 </div>
                 <div className="mt-2">
                   <input
+                    value={data.password}
+                    onChange={(e) =>
+                      setData({ ...data, password: e.target.value })
+                    }
                     id="password"
                     name="password"
                     type="password"
@@ -64,8 +96,11 @@ export default function Login() {
                 </div>
               </div>
 
+              {error && <div className="text-red-500">{error}</div>}
+
               <div>
                 <button
+                  onClick={handleSubmit}
                   type="submit"
                   className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >

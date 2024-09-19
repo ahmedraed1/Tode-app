@@ -3,6 +3,10 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
+import axios from "axios";
+
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = "http://localhost:3000";
 
 function App() {
   return (
