@@ -2,6 +2,8 @@ import NavBar from "../../components/NavBar/NavBar";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 export default function SignUp() {
   const [data, setData] = useState({
     name: "",
@@ -12,13 +14,16 @@ export default function SignUp() {
 
   const navigate = useNavigate();
 
+  const { setIsLoggedIn } = useContext(AuthContext);
+
   const handleSubmit = async () => {
     await axios
       .post("http://localhost:3000/api/auth/register", { ...data })
       .then((res) => {
         if (res.status === 201) {
-          navigate("/dashboard");
           localStorage.setItem("token", res.data.token);
+          navigate("/dashboard");
+          setIsLoggedIn(true);
         }
       })
       .catch((err) => {
@@ -123,7 +128,7 @@ export default function SignUp() {
           <p class="mt-10 text-center text-sm text-gray-500">
             Do you already have an account?
             <Link
-              to="/login"
+              to="/"
               class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500 ml-2"
             >
               Log in

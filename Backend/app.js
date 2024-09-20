@@ -18,15 +18,6 @@ app.use(
 );
 app.use(express.json());
 
-app.get("/api/auth", authenticationToken, (req, res) => {
-  const { userId: id } = req.user;
-  const user = User.findById(id);
-  if (!user) {
-    return res.status(400).json({ msg: "Invalid credentials", success: false });
-  }
-  res.status(200).json({ user, success: true });
-});
-
 app.post("/api/auth/register", async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) {
@@ -80,7 +71,7 @@ app.post("/api/auth/login", async (req, res) => {
   if (!user) {
     return res.status(400).json({ msg: "Invalid credentials", success: false });
   }
-  const isMatch = await user.comparePassword(password); // compare password
+  const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
     return res.status(400).json({ msg: "Invalid credentials", success: false });
@@ -182,6 +173,24 @@ app.get("/api/notes/update-pinned", authenticationToken, async (req, res) => {
       .json({ msg: "Failed to update Note", success: false });
   }
   res.status(201).json({ updatedNote, success: true });
+});
+
+app.get("/api/auth", authenticationToken, async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ msg: "Invalid credentials", success: false });
+    }
+
+    res.status(200).json({ user, success: true });
+  } catch (error) {
+    res.status(500).json({ msg: "Internal server error", success: false });
+  }
 });
 
 const PORT = process.env.PORT || 3000;

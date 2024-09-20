@@ -1,3 +1,4 @@
+import { useState } from "react";
 export default function NoteCard({
   title,
   date,
@@ -8,25 +9,28 @@ export default function NoteCard({
   onDelete,
   onPinNote,
 }) {
+  const [tagsState, setTagsState] = useState(tags);
   return (
     <>
       <div class="rounded">
         <div class="w-full h-64 flex flex-col justify-between bg-gray-100 text-gray-900 rounded-lg border border-gray-400 mb-6 py-5 px-4">
           <div>
-            <h4 class="text-gray-800  font-bold mb-3">13 things to work on</h4>
-            <p class="text-gray-800  text-sm">
-              Our interior design experts work with you to create the space that
-              you have been dreaming about.
-            </p>
+            <h4 class="text-gray-800  font-bold mb-3">{title}</h4>
+            <p class="text-gray-800  text-sm">{content}</p>
           </div>
           <div className="flex flex-row gap-2 flex-wrap w-full h-fit">
-            <span className="block">#Vue</span>
-            <span className="block">#react</span>
-            <span className="block">#javascript</span>
+            {tagsState.map((tag) => (
+              <span
+                class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                key={tag}
+              >
+                {tag}
+              </span>
+            ))}
           </div>
           <div>
             <div class="flex items-center justify-between text-gray-800">
-              <p class="text-sm">March 28, 2020</p>
+              <p class="text-sm">{date}</p>
               <div className="flex flex-row gap-2">
                 <button
                   class="w-8 h-8 rounded-full bg-gray-800 text-white flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-black"

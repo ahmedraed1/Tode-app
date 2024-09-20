@@ -1,7 +1,9 @@
 import NavBar from "../../components/NavBar/NavBar";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 export default function Login() {
   const [data, setData] = useState({
     email: "",
@@ -9,6 +11,8 @@ export default function Login() {
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  const { setIsLoggedIn } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,12 +23,35 @@ export default function Login() {
         if (res.status === 200) {
           localStorage.setItem("token", res.data.token);
           navigate("/dashboard");
+          setIsLoggedIn(true);
         }
       })
       .catch((err) => {
         setError(err);
       });
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return;
+    }
+    axios
+      .get("/api/auth", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        if (res.status == 200) {
+          navigate("/dashboard");
+          setIsLoggedIn(true);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [navigate, setIsLoggedIn]);
   return (
     <>
       <div>
